@@ -10,11 +10,11 @@ Descripción del problema.
 ----------
 Relevancia del problema
 
-* Luís,Lothar:
+* Luís, Lothar:
 --------------
  Uso de IA.
 
-* Rafiki,Lothar: 
+* Rafiki, Lothar: 
 ----------------
 Técnicas de la IA.
 
