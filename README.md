@@ -10,7 +10,7 @@ Descripción del problema.
 ----------
 Relevancia del problema
 
-* Luís, Lothar:
+* Luís, Lothar, Rafa:
 --------------
  Uso de IA.
 
