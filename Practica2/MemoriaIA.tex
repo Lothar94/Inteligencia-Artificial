@@ -1,0 +1,233 @@
+%%
+% Modificación de una plantilla de Latex para adaptarla al castellano.
+%%
+
+%%%%%%%%%%%%%%%%%%%%%
+% Thin Sectioned Essay
+% LaTeX Template
+% Version 1.0 (3/8/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original Author:
+% Nicolas Diaz (nsdiaz@uc.cl) with extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[a4paper, 11pt]{article} % Font size (can be 10pt, 11pt or 12pt) and paper size (remove a4paper for US letter paper)
+
+\usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\usepackage{graphicx} % Required for including pictures
+\usepackage[usenames,dvipsnames]{color} % Coloring code
+\usepackage{wrapfig} % Allows in-line images
+\usepackage[utf8]{inputenc}
+\usepackage{enumerate}
+\usepackage{enumitem}
+
+% Imágenes
+\usepackage{graphicx} 
+
+\usepackage{amsmath}
+% para importar svg
+%\usepackage[generate=all]{svgfig}
+
+% sudo apt-get install texlive-lang-spanish
+\usepackage[spanish]{babel} % English language/hyphenation
+\selectlanguage{spanish}
+\usepackage{anysize}
+% Hay que pelearse con babel-spanish para el alineamiento del punto decimal
+\decimalpoint
+\usepackage{dcolumn}
+\newcolumntype{d}[1]{D{.}{\esperiod}{#1}}
+\makeatletter
+\addto\shorthandsspanish{\let\esperiod\es@period@code}
+\makeatother
+
+\usepackage{longtable}
+\usepackage{tabu}
+\usepackage{supertabular}
+
+\usepackage{multicol}
+\newsavebox\ltmcbox
+
+% Para algoritmos
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsthm}
+
+% Para matrices
+\usepackage{amsmath}
+
+% Símbolos matemáticos
+\usepackage{amssymb}
+\usepackage{accents}
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+
+\usepackage[hidelinks]{hyperref}
+
+\usepackage[section]{placeins} % Para gráficas en su sección.
+\usepackage[T1]{fontenc} % Required for accented characters
+\newenvironment{allintypewriter}{\ttfamily}{\par}
+\setlength{\parindent}{0pt}
+\parskip=8pt
+\linespread{1.05} % Change line spacing here, Palatino benefits from a slight increase by default
+
+\makeatletter
+\renewcommand\@biblabel[1]{\textbf{#1.}} % Change the square brackets for each bibliography item from '[1]' to '1.'
+\renewcommand{\@listI}{\itemsep=0pt} % Reduce the space between items in the itemize and enumerate environments and the bibliography
+\newcommand{\imagen}[2]{\begin{center} \includegraphics[width=90mm]{#1} \\#2 \end{center}}
+\newcommand{\RFC}[1]{\href{https://www.ietf.org/rfc/rfc#1.txt}{RFC-#1}}
+
+\renewcommand{\maketitle}{ % Customize the title - do not edit title and author name here, see the TITLE block below
+\begin{center} % Center align
+{\Huge\@title} % Increase the font size of the title
+\end{center}
+
+\vspace{20pt} % Some vertical space between the title and author name
+
+\begin{flushright} % Right align
+{\large\@author} % Author name
+\\\@date % Date
+
+\vspace{40pt} % Some vertical space between the author block and abstract
+\end{flushright}
+}
+%----------------------------------------------------------------------------------------
+%	TITLE
+%----------------------------------------------------------------------------------------
+
+\title{Memoria: El Robot Trufero}
+ % Subtitle
+
+\author{\textsc{Lothar Soto Palma} % Author
+\\{\textit{Universidad de Granada}}} % Institution
+
+\date{\today} % Date
+
+%----------------------------------------------------------------------------------------
+\setcounter{secnumdepth}{0}
+%\marginsize{1.2}{1.5}{1.5}{1.5}
+
+\begin{document}
+\maketitle
+\section{Idea Inicial}
+La idea inicial del problema fue hacer que nuestro agente fuera capaz de reaccionar dentro de un entorno en primer lugar desconocido, de manera que a medida que fuera explorando dicho entorno este fuera capaz de realizar decisiones de tipo reactivas, es decir, se basa en el conocimiento de un área limitada del entorno a su alrededor para la toma de decisiones. Para llevar a cabo esto lo primero es darle memoria a nuestro agente, dotarlo de una matriz lo suficientemente grande como para albergar un "mapa" del entorno, debido a que cada mapa es distinto y no es posible preveer la forma y los obstaculos del mismo, se hace necesaria la idea de introducir un camino que el agente deba seguir de manera que todo el mapa sea explorado ya que no podemos limitarnos a una zona del mapa.
+\section{Comportamiento}
+El comportamiento del agente se basa en tres fases:
+\begin{enumerate}
+\item \textbf{Exploración}:
+Debido a que los primeros pasos del agente no son beneficiosos en lo que a la recolección y olfateo se refiere intentamos ahorrarnos el olfateo en los 100 primeros pasos (dependiendo),esos pasos los dedicamos a la exploración del mapa sobre todo para que el agente investigue el mayor número de obstaculos para poder evitarlos cuando se olfatee, comenzará a olfatear a partir de entonces cuando las trufas estén más crecidas, podemos diferenciar dos casos:
+\begin{itemize}
+\item \textbf{Crecimiento Lento}: Si el crecimiento es lento, exploramos el mapa en los 100 primeros pasos ahorrandonos al menos otros 100 pasos que se realizarían al olfatear en cada una de las posiciones, debido a que las trufas no crecen tan rápido como para pudrirse en lo que el agente da 100 pasos.
+\item \textbf{Crecimiento Rápido}: Finalmente se probó una implementación que permitida diferenciar el crecimiento modificando su condicion de recogida pero no resultó satisfactoria (ver Modificación en recogida).
+\end{itemize}
+\item \textbf{Vuelta al inicio}:
+El agente como va a ir a la posición más antigua de las que le rodean (posiciones horizontales o verticales a él) va a acabar volviendo al inicio y como ha estado explorando y dejando crecer las trufas, una vez tiene explorado gran parte de el mapa comienza la recolección.
+\item \textbf{Recolección}:
+El agente irá olfateando y recogiendo una vez se ha explorado el mapa además el algoritmo seguido impide que este vuelva a chocarse con paredes por lo que también ahorraremos pasos con eso, por último la recolección se realiza conforme a una cota, es decir, si al olfatear hay un número de trufas mayor al mínimo de recolección recogerá dicha posición. Además si se han superado casi todos los pasos es decir si quedan 100 pasos para llegar a los 2000 se recogen ya no olfateamos y siempre se recoge.
+\end{enumerate}
+\section{Diseño de la estructura del agente}
+Analizaremos el agente y su estructura interna, es decir analizaremos agente.h y sus variables y funciones definidas:
+\begin{itemize}
+\item \textbf{mapa[19][19]}: Matriz que se usa para ir guardando el mapa, vamos a definir una leyenda de valores para poder interpretar el mapa:
+\begin{itemize}
+\item -1 : Valor que se usa para indicar que en esa posición hay una pared o obstaculo.
+\item 0 : Valor que indica que no se ha explorado la posición. 
+\item $[1,2000]$ : Valor que indica el paso en el que el agente exploró la posición.
+\end{itemize}
+Entonces como podemos observar en la figura 1, el mapa al inicializarse lo hace con todas las posiciónes a 0 y en ese caso la primera vez que avance la casilla en la que se encontraba marcará 1. En la figura 2 vemos como el agente ha explorado el mapa determinando la localización de las paredes y se mueve por el dirigiendose a la posición más antigua o que hace mas turnos que no visita.
+\begin{figure}[H]
+\centering 
+\includegraphics[width=0.8\linewidth]{captura} 
+\caption{Estado inicial del Mapa.}
+\label{contexto:figura} 
+\end{figure}
+\begin{figure}[H]
+\centering 
+\includegraphics[width=0.8\linewidth]{captura2} 
+\caption{Estado avanzado del Mapa.}
+\label{contexto:figura} 
+\end{figure}
+
+\item \textbf{pos\_x, pos\_y}: Indican la posición en la que se encuentra el agente, de forma inicial pos\_x = 9 = pos\_y para que se encuentre aproximadamente en el centro de la matriz, y a partir de ese momento incrementar o disminuir en función de la dirección del agente.
+\item \textbf{paso}: Guarda el paso (turno) en el que se encuentra el agente para poder ir cambiando de acción, además esta variable se va guardando en cada posición de la matriz que no sea una pared para encontrar la posición más antigua con la función obtenerDireccion().
+\item \textbf{director}: Nos indica la dirección en la que se encuentra el agente, hace uso de los valores 0,1,2,3 y por ejemplo si comienza mirando en dirección norte la sucesión es norte, oeste, sur, este respectivamente.
+\item \textbf{recogida}: Indica el número de trufas que se ha recogido hasta el momento, puede ser de utilidad pero finalmente se obtuvieron mejores resultados sin usarlo.
+\item \textbf{ultimo\_paso}: Contiene la acción anterior, gracias a ella es que el agente es capaz de saber cuando recoger o oler entre otras.
+\item \textbf{obtenerDireccion()}: Esta es una típica función de minimo entre cuatro valores, los valores relacionados con las posiciones que se encuentran adjacentes al agente, haciendo uso de la variable paso, además también introduce una mejora que es si el agente tiene una posición inexplorada adjacente en la dirección en la que se encuentra escoge dicha dirección.
+\item \textbf{Mostrarmat()}: Función simple que nos permite mostrar el estado de la matriz.
+\end{itemize}
+\section{Resultados y otros algoritmos}
+Vamos a analizar los resultados obtenidos finalmente con los obtenidos con algoritmos con ligeras modificaciones. 
+\subsection{Algoritmo final: Resultados}
+Los resultados finales obtenidos son los representados en las siguientes dos tablas:
+\begin{table}[H]
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+Mapas & agent.map & mapa1.map & mapa2.map & mapa3.map \\ 
+\hline 
+Total(10 runs) & 15043 & 16499 & 15681 & 16170 \\ 
+\hline 
+Media(10 runs) & 1504.3 & 1649.9 & 1568.1 & 1617.0 \\ 
+\hline 
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+Mapas & agent\_rap.map & mapa1\_rap.map & mapa2\_rap.map & mapa3\_rap.map \\ 
+\hline 
+Total(10 runs) & 30061 & 31972 & 31946 & 31627 \\ 
+\hline 
+Media(10 runs) & 3006.1 & 3197.2 & 3194.6 & 3162.7 \\ 
+\hline 
+\end{tabular}
+\end{table}
+\subsection{Algoritmo: Modificación en recogida y resultados}
+Se intento mejorar los resultados cambiando la condición de recogida, lo que se intentó fue ir almacenando cada 200 pasos la diferencia del total de trufas recogidas menos las que se recogieron hace 200 pasos, y si esa diferencia es menor o igual que un valor establecido (se uso el valor 150 debido a que era la diferencia mayor que se solia dar en los mapas de crecimiento rapido y no se alcanzaba en los lentos) la acotación de la condición de recogida era reducida ya que eso quiere indicar que hemos recogido muchas y por tanto las trufas del mapa pueden haber crecido mucho, en caso contrario se establecia la cota a la que se tiene por defecto los resultados obtenidos fueron:
+\begin{table}[H]
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+Mapas & agent.map & mapa1.map & mapa2.map & mapa3.map \\ 
+\hline 
+Total(10 runs) & 13744 & 15230 & 14696 & 15364 \\ 
+\hline 
+Media(10 runs) & 1374.0 & 1523.0 & 1469.6 & 1536.4 \\ 
+\hline 
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+Mapas & agent\_rap.map & mapa1\_rap.map & mapa2\_rap.map & mapa3\_rap.map \\ 
+\hline 
+Total(10 runs) & 29034 & 31278 & 30942 & 30740 \\ 
+\hline 
+Media(10 runs) & 2903.4 & 3127.8 & 3094.2 & 3074.0 \\ 
+\hline 
+\end{tabular}
+\end{table}
+
+Como se puede ver deja a todos los mapas de crecimiento lento igual pero los de crecimiento rápido se ven afectados aunque reducen su recogida, recoge menos en todos los casos a excepción del último mapa3\_rap.map que recoge un poco más, por esto determine quitar la condición de recogida y recoger solo cuando nos encontraramos con 10 trufas o más.
+\begin{center}
+Crecimiento lento.\\
+\includegraphics[width=0.6\linewidth]{barras} 
+
+\end{center}
+\begin{center}
+Crecimiento rápido.\\
+\includegraphics[width=0.6\linewidth]{barras2} 
+
+\end{center}
+
+\end{document}
